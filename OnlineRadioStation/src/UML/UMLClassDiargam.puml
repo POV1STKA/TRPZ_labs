@@ -1,0 +1,99 @@
+@startuml
+
+class User {
+    - String id
+    - String login
+    - String password
+    - String ipAddress
+    - Role role
+    - List<String> statisticIds
+    - List<String> playlistIds
+    + getId(): String
+    + setId(id: String): void
+    + getLogin(): String
+    + setLogin(login: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+    + getIpAddress(): String
+    + setIpAddress(ipAddress: String): void
+    + getRole(): Role
+    + setRole(role: Role): void
+    + getStatisticIds(): List<String>
+    + setStatisticIds(statisticIds: List<String>): void
+    + getPlaylistIds(): List<String>
+    + setPlaylistIds(playlistIds: List<String>): void
+    + addPlaylistId(playlistId: String): void
+}
+
+class Playlist {
+    - String id
+    - String name
+    - List<String> songIds
+    - String ownerId
+    - Status status
+    + getId(): String
+    + setId(id: String): void
+    + getName(): String
+    + setName(name: String): void
+    + getSongIds(): List<String>
+    + setSongIds(songIds: List<String>): void
+    + getOwnerId(): String
+    + setOwnerId(ownerId: String): void
+    + getStatus(): Status
+    + setStatus(status: Status): void
+    + addSongId(songId: String): void
+}
+
+class Song {
+    - String id
+    - String title
+    - List<String> artistIds
+    + getId(): String
+    + setId(id: String): void
+    + getTitle(): String
+    + setTitle(title: String): void
+    + getArtistIds(): List<String>
+    + setArtistIds(artistIds: List<String>): void
+    + addArtistId(artistId: String): void
+}
+
+class Artist {
+    - String id
+    - String name
+    + getId(): String
+    + setId(id: String): void
+    + getName(): String
+    + setName(name: String): void
+}
+
+class Statistic {
+    - String id
+    - LocalDateTime visitTime
+    - int listeningDuration
+    - List<String> songIds
+    + getId(): String
+    + setId(id: String): void
+    + getVisitTime(): LocalDateTime
+    + setVisitTime(visitTime: LocalDateTime): void
+    + getListeningDuration(): int
+    + setListeningDuration(listeningDuration: int): void
+    + getSongIds(): List<String>
+    + setSongIds(songIds: List<String>): void
+    + addSongId(songId: String): void
+}
+
+class Role {
+    - String roleName
+    + getRoleName(): String
+    + setRoleName(roleName: String): void
+}
+
+User --> Role: role
+User --> Statistic : statisticIds
+User --> Playlist : playlistIds
+Playlist --> Song : songIds
+Playlist --> User : ownerId
+Song --> Artist : artistIds
+Statistic --> Song : songIds
+
+@enduml
