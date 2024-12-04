@@ -14,6 +14,12 @@ public class Song {
         this.artistIds = new ArrayList<>();
     }
 
+    public Song(String id, String title, List<String> artistIds) {
+        this.id = id;
+        this.title = title;
+        this.artistIds = artistIds;
+    }
+
     public String getId() {
         return id;
     }
