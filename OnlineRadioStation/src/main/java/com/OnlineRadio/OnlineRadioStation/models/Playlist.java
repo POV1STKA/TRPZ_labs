@@ -63,4 +63,9 @@ public class Playlist {
     public void addSongId(String songId) {
         songIds.add(songId);
     }
+
+    public void removeSongId(String songId) {
+        songIds.remove(songId);
+    }
+
 }
