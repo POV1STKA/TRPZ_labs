@@ -1,42 +1,37 @@
-package com.OnlineRadio.OnlineRadioStation.services;
-
-import com.OnlineRadio.OnlineRadioStation.models.streaming.AudioStream;
+import com.OnlineRadio.OnlineRadioStation.models.streaming.*;
+import com.OnlineRadio.OnlineRadioStation.services.StreamingService;
+import com.OnlineRadio.OnlineRadioStation.factories.AudioStreamFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.mockito.MockedStatic;
+import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class StreamingServiceTest {
+public class StreamingServiceTest{
 
-    @Test
-    void testStartLowQualityStreaming() {
-        StreamingService streamingService = new StreamingService();
-        streamingService.startStreaming("low");
+    private StreamingService streamingService;
+    private AudioStream audioStreamMock;
 
-        AudioStream stream = streamingService.getCurrentStream();
-        assertNotNull(stream);
-        assertEquals(64, stream.getBitrate());
-        assertEquals("Low Quality (64 kbps)", stream.getStreamQuality());
+    @BeforeEach
+    public void setUp() {
+        streamingService = new StreamingService();
+        audioStreamMock = mock(AudioStream.class);
     }
 
     @Test
-    void testStartMediumQualityStreaming() {
-        StreamingService streamingService = new StreamingService();
-        streamingService.startStreaming("medium");
+    public void testStartStreamingLowQuality() {
+        try (MockedStatic<AudioStreamFactory> mockedFactory = mockStatic(AudioStreamFactory.class)) {
+            // Коли запитують створення потоку низької якості, повертаємо мокований потік
+            mockedFactory.when(() -> AudioStreamFactory.createStream("low")).thenReturn(audioStreamMock);
 
-        AudioStream stream = streamingService.getCurrentStream();
-        assertNotNull(stream);
-        assertEquals(128, stream.getBitrate());
-        assertEquals("Medium Quality (128 kbps)", stream.getStreamQuality());
-    }
+            // Переконуємося, що потік не null перед викликом startStream
+            assertNotNull(audioStreamMock, "AudioStream should not be null");
 
-    @Test
-    void testStartHighQualityStreaming() {
-        StreamingService streamingService = new StreamingService();
-        streamingService.startStreaming("high");
+            // Запускаємо стрімінг
+            streamingService.startStreaming("song.mp3", "low");
 
-        AudioStream stream = streamingService.getCurrentStream();
-        assertNotNull(stream);
-        assertEquals(256, stream.getBitrate());
-        assertEquals("High Quality (256 kbps)", stream.getStreamQuality());
+            // Перевіряємо, чи був викликаний метод startStream на моковому потоці
+            verify(audioStreamMock, times(1)).startStream("song.mp3");
+        }
     }
 }

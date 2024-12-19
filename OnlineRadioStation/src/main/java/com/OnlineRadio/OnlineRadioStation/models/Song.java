@@ -7,16 +7,19 @@ public class Song {
     private String id;
     private String title;
     private List<String> artistIds;
+    private String filePath;
 
-    public Song(String id, String title) {
+    public Song(String id, String title, String filePath) {
         this.id = id;
         this.title = title;
+        this.filePath = filePath;
         this.artistIds = new ArrayList<>();
     }
 
-    public Song(String id, String title, List<String> artistIds) {
+    public Song(String id, String title, String filePath, List<String> artistIds) {
         this.id = id;
         this.title = title;
+        this.filePath = filePath;
         this.artistIds = artistIds;
     }
 
@@ -46,5 +49,13 @@ public class Song {
 
     public void addArtistId(String artistId) {
         artistIds.add(artistId);
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

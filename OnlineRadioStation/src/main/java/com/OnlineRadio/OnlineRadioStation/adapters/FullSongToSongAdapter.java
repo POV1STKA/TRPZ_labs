@@ -21,6 +21,6 @@ public class FullSongToSongAdapter implements SongAdapter {
                 .map(Artist::getId)
                 .collect(Collectors.toList());
 
-        return new Song(fullSong.getId(), fullSong.getTitle(), artistIds);
+        return new Song(fullSong.getId(), fullSong.getTitle(), fullSong.getFilePath(), artistIds);
     }
 }

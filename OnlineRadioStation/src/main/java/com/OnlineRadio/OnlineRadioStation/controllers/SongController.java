@@ -1,40 +1,34 @@
 package com.OnlineRadio.OnlineRadioStation.controllers;
 
 import com.OnlineRadio.OnlineRadioStation.models.Song;
-import com.OnlineRadio.OnlineRadioStation.services.SongService;
-
+import com.OnlineRadio.OnlineRadioStation.facade.OnlineRadioFacade;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@RestController
+@RequestMapping("/api/songs")
 public class SongController {
-    private SongService songService;
 
-    public SongController(SongService songService) {
-        this.songService = songService;
+    private final OnlineRadioFacade facade;
+
+    @Autowired
+    public SongController(OnlineRadioFacade facade) {
+        this.facade = facade;
     }
 
-    public void addSong(Song song) {
-        songService.addSong(song);
-    }
-
+    @GetMapping
     public List<Song> getAllSongs() {
-        return songService.getSongs();
+        return facade.getAllSongs();
     }
 
-    public void playSongsInOrder() {
-        System.out.println("Playing songs in order:");
-        var iterator = songService.getSongIterator();
-        while (iterator.hasNext()) {
-            Song song = iterator.next();
-            System.out.println("Playing: " + song.getTitle());
-        }
+    @PostMapping
+    public void addSong(@RequestBody Song song) {
+        facade.addSong(song);
     }
 
-    public void playSongsInRandomOrder() {
-        System.out.println("Playing songs in random order:");
-        var iterator = songService.getRandomSongIterator();
-        while (iterator.hasNext()) {
-            Song song = iterator.next();
-            System.out.println("Playing: " + song.getTitle());
-        }
+    @DeleteMapping("/{songId}")
+    public void removeSong(@PathVariable String songId) {
+        facade.removeSong(songId);
     }
 }

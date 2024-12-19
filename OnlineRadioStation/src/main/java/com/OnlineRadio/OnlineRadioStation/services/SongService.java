@@ -1,39 +1,31 @@
 package com.OnlineRadio.OnlineRadioStation.services;
 
-import com.OnlineRadio.OnlineRadioStation.adapters.FullSongToSongAdapter;
-import com.OnlineRadio.OnlineRadioStation.models.FullSong;
 import com.OnlineRadio.OnlineRadioStation.models.Song;
-import com.OnlineRadio.OnlineRadioStation.iterators.SongIterator;
-import com.OnlineRadio.OnlineRadioStation.iterators.RandomSongIterator;
-
+import com.OnlineRadio.OnlineRadioStation.repositories.SongRepository;
+import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-
+@Service
 public class SongService {
-    private List<Song> songs;
+    private final SongRepository songRepository;
 
-    public SongService() {
-        this.songs = new ArrayList<>();
+    public SongService(SongRepository songRepository) {
+        this.songRepository = songRepository;
     }
 
     public void addSong(Song song) {
-        songs.add(song);
+        songRepository.addSong(song);
     }
 
-    public void addSong(FullSong fullSong) {
-        FullSongToSongAdapter adapter = new FullSongToSongAdapter(fullSong);
-        songs.add(adapter.adapt());
+    public void removeSong(String songId) {
+        songRepository.removeSong(songId);
     }
 
-    public List<Song> getSongs() {
-        return songs;
+    public Song findSongById(String songId) {
+        return songRepository.findSongById(songId);
     }
 
-    public SongIterator getSongIterator() {
-        return new SongIterator(songs);
-    }
-
-    public RandomSongIterator getRandomSongIterator() {
-        return new RandomSongIterator(songs);
+    public List<Song> getAllSongs() {
+        return new ArrayList<>(songRepository.getAllSongs());
     }
 }

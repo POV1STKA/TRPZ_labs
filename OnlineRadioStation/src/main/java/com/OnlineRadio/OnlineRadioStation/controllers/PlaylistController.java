@@ -1,27 +1,46 @@
 package com.OnlineRadio.OnlineRadioStation.controllers;
 
+import com.OnlineRadio.OnlineRadioStation.facade.OnlineRadioFacade;
 import com.OnlineRadio.OnlineRadioStation.models.Playlist;
 import com.OnlineRadio.OnlineRadioStation.models.Song;
-import com.OnlineRadio.OnlineRadioStation.services.PlaylistService;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@RestController
+@RequestMapping("/api/playlists")
 public class PlaylistController {
-    private PlaylistService playlistService;
 
-    public PlaylistController(PlaylistService playlistService) {
-        this.playlistService = playlistService;
+    private final OnlineRadioFacade facade;
+
+    @Autowired
+    public PlaylistController(OnlineRadioFacade facade) {
+        this.facade = facade;
     }
 
-    public void createPlaylist(Playlist playlist) {
-        playlistService.createPlaylist(playlist);
+    @PostMapping
+    public Playlist createPlaylist(@RequestParam String name, @RequestParam String ownerId,
+                                   @RequestParam Playlist.Status status) {
+        return facade.createPlaylist(name, ownerId, status);
     }
 
-    public void addSongToPlaylist(String playlistId, String songId) {
-        playlistService.addSongToPlaylist(playlistId, songId);
+    @DeleteMapping("/{playlistId}")
+    public void deletePlaylist(@PathVariable String playlistId) {
+        facade.deletePlaylist(playlistId);
     }
 
-    public List<Song> getSongsFromPlaylist(String playlistId) {
-        return playlistService.getSongsFromPlaylist(playlistId);
+    @PostMapping("/{playlistId}/songs")
+    public void addSongToPlaylist(@PathVariable String playlistId, @RequestParam String songId) {
+        facade.addSongToPlaylist(playlistId, songId);
+    }
+
+    @DeleteMapping("/{playlistId}/songs")
+    public void removeSongFromPlaylist(@PathVariable String playlistId, @RequestParam String songId) {
+        facade.removeSongFromPlaylist(playlistId, songId);
+    }
+
+    @GetMapping("/{playlistId}/songs")
+    public List<Song> getSongsFromPlaylist(@PathVariable String playlistId) {
+        return facade.getSongsFromPlaylist(playlistId);
     }
 }

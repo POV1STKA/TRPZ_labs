@@ -81,4 +81,9 @@ public class User {
     public void addPlaylistId(String playlistId) {
         playlistIds.add(playlistId);
     }
+
+    public void addStatisticId(String statisticId) {
+        statisticIds.add(statisticId);
+    }
+
 }
