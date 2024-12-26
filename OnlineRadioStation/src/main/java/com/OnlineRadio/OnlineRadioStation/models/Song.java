@@ -2,19 +2,35 @@ package com.OnlineRadio.OnlineRadioStation.models;
 
 import java.util.List;
 import java.util.ArrayList;
+import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
+import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
 
-public class Song {
+public class Song implements Visitable{
     private String id;
     private String title;
     private List<String> artistIds;
+    private String filePath;
 
-    public Song(String id, String title) {
+    public Song(String id, String title, String filePath) {
         this.id = id;
         this.title = title;
+        this.filePath = filePath;
         this.artistIds = new ArrayList<>();
     }
 
-    public String getId() {
+    public Song(String id, String title, String filePath, List<String> artistIds) {
+        this.id = id;
+        this.title = title;
+        this.filePath = filePath;
+        this.artistIds = artistIds;
+    }
+
+    @Override
+    public void accept(StatisticsVisitor visitor) {
+        visitor.visitSong(this);
+    }
+
+        public String getId() {
         return id;
     }
 
@@ -40,5 +56,13 @@ public class Song {
 
     public void addArtistId(String artistId) {
         artistIds.add(artistId);
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

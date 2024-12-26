@@ -2,8 +2,10 @@ package com.OnlineRadio.OnlineRadioStation.models;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
+import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
 
-public class Playlist {
+public class Playlist implements Visitable{
     public enum Status { PUBLIC, PRIVATE, CLOSED }
 
     private String id;
@@ -19,6 +21,12 @@ public class Playlist {
         this.status = status;
         this.songIds = new ArrayList<>();
     }
+
+    @Override
+    public void accept(StatisticsVisitor visitor) {
+        visitor.visitPlaylist(this);
+    }
+
 
     public String getId() {
         return id;
@@ -63,4 +71,9 @@ public class Playlist {
     public void addSongId(String songId) {
         songIds.add(songId);
     }
+
+    public void removeSongId(String songId) {
+        songIds.remove(songId);
+    }
+
 }

@@ -1,18 +1,31 @@
 package com.OnlineRadio.OnlineRadioStation.repositories;
+
 import com.OnlineRadio.OnlineRadioStation.models.Playlist;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+@Repository
 public class PlaylistRepository {
-    private Map<String, Playlist> playlists = new HashMap<>();
+    private final Map<String, Playlist> playlists = new HashMap<>();
 
-    public void addPlaylist(Playlist playlist) {
+    public void insert(Playlist playlist) {
         playlists.put(playlist.getId(), playlist);
     }
 
-    public Playlist findPlaylistById(String id) {
-        return playlists.get(id);
+    public Playlist findById(String playlistId) {
+        return playlists.get(playlistId);
+    }
+
+    public List<Playlist> findAll() {
+        return new ArrayList<>(playlists.values());
+    }
+
+    public void deleteById(String playlistId) {
+        playlists.remove(playlistId);
+    }
+
+    public void update(Playlist playlist) {
+        playlists.put(playlist.getId(), playlist);
     }
 }
-
