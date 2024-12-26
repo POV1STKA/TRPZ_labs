@@ -2,8 +2,10 @@ package com.OnlineRadio.OnlineRadioStation.models;
 
 import java.util.List;
 import java.util.ArrayList;
+import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
+import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
 
-public class Song {
+public class Song implements Visitable{
     private String id;
     private String title;
     private List<String> artistIds;
@@ -23,7 +25,12 @@ public class Song {
         this.artistIds = artistIds;
     }
 
-    public String getId() {
+    @Override
+    public void accept(StatisticsVisitor visitor) {
+        visitor.visitSong(this);
+    }
+
+        public String getId() {
         return id;
     }
 

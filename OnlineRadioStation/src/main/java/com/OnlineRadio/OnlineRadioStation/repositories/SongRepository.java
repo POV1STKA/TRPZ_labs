@@ -2,26 +2,30 @@ package com.OnlineRadio.OnlineRadioStation.repositories;
 
 import com.OnlineRadio.OnlineRadioStation.models.Song;
 import org.springframework.stereotype.Repository;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 @Repository
 public class SongRepository {
-    private final List<Song> songs = new ArrayList<>();
+    private final Map<String, Song> songs = new HashMap<>();
 
-    public void addSong(Song song) {
-        songs.add(song);
+    public void insert(Song song) {
+        songs.put(song.getId(), song);
     }
 
-    public void removeSong(String songId) {
-        songs.removeIf(song -> song.getId().equals(songId));
+    public Song findById(String songId) {
+        return songs.get(songId);
     }
 
-    public Song findSongById(String songId) {
-        return songs.stream().filter(song -> song.getId().equals(songId)).findFirst().orElse(null);
+    public List<Song> findAll() {
+        return new ArrayList<>(songs.values());
     }
 
-    public List<Song> getAllSongs() {
-        return new ArrayList<>(songs);
+    public void deleteById(String songId) {
+        songs.remove(songId);
+    }
+
+    public void update(Song song) {
+        songs.put(song.getId(), song);
     }
 }

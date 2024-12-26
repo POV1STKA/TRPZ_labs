@@ -2,8 +2,10 @@ package com.OnlineRadio.OnlineRadioStation.models;
 
 import java.util.List;
 import java.util.ArrayList;
+import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
+import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
 
-public class User {
+public class User implements Visitable {
     private String id;
     private String login;
     private String password;
@@ -20,6 +22,20 @@ public class User {
         this.role = role;
         this.statisticIds = new ArrayList<>();
         this.playlistIds = new ArrayList<>();
+    }
+
+    public User(String id, String login, String password, String ipAddress) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.ipAddress = ipAddress;
+        this.statisticIds = new ArrayList<>();
+        this.playlistIds = new ArrayList<>();
+    }
+
+    @Override
+    public void accept(StatisticsVisitor visitor) {
+        visitor.visitUser(this);
     }
 
     public String getId() {

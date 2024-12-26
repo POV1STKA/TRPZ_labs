@@ -43,26 +43,6 @@ public class OnlineRadioFacade {
         playlistService.deletePlaylist(playlistId);
     }
 
-    public void addSongToPlaylist(String playlistId, String songId) {
-        playlistService.addSongToPlaylist(playlistId, songId);
-    }
-
-    public void removeSongFromPlaylist(String playlistId, String songId) {
-        playlistService.removeSongFromPlaylist(playlistId, songId);
-    }
-
-    public List<Song> getSongsFromPlaylist(String playlistId) {
-        List<String> songIds = playlistService.getSongIdsInPlaylist(playlistId);
-        List<Song> songs = new ArrayList<>();
-        for (String songId : songIds) {
-            Song song = songService.findSongById(songId);
-            if (song != null) {
-                songs.add(song);
-            }
-        }
-        return songs;
-    }
-
     public void stopStreaming() {
         streamingService.stopStreaming();
     }
