@@ -1,105 +1,36 @@
 package com.OnlineRadio.OnlineRadioStation.models;
 
-import java.util.List;
-import java.util.ArrayList;
-import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
-import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-public class User implements Visitable {
-    private String id;
+@Entity
+@Table(name = "user")
+@Getter
+@Setter
+public class User{
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "login")
     private String login;
+
+    @Column(name = "password")
     private String password;
-    private String ipAddress;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
-    private List<String> statisticIds;
-    private List<String> playlistIds;
 
-    public User(String id, String login, String password, String ipAddress, Role role) {
-        this.id = id;
+    public User() {}
+
+    public User(String login, String password, Role role) {
         this.login = login;
         this.password = password;
-        this.ipAddress = ipAddress;
-        this.role = role;
-        this.statisticIds = new ArrayList<>();
-        this.playlistIds = new ArrayList<>();
-    }
-
-    public User(String id, String login, String password, String ipAddress) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
-        this.ipAddress = ipAddress;
-        this.statisticIds = new ArrayList<>();
-        this.playlistIds = new ArrayList<>();
-    }
-
-    @Override
-    public void accept(StatisticsVisitor visitor) {
-        visitor.visitUser(this);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
         this.role = role;
     }
 
-    public List<String> getStatisticIds() {
-        return statisticIds;
-    }
-
-    public void setStatisticIds(List<String> statisticIds) {
-        this.statisticIds = statisticIds;
-    }
-
-    public List<String> getPlaylistIds() {
-        return playlistIds;
-    }
-
-    public void setPlaylistIds(List<String> playlistIds) {
-        this.playlistIds = playlistIds;
-    }
-
-    public void addPlaylistId(String playlistId) {
-        playlistIds.add(playlistId);
-    }
-
-    public void addStatisticId(String statisticId) {
-        statisticIds.add(statisticId);
-    }
-
+    public enum Role { ADMIN, USER }
 }

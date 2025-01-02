@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Management</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        select, input[type="text"], input[type="search"] {
+            width: 100%;
+        }
+        .artist-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .artist-item {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .artist-item.selected {
+            background-color: lightgreen;
+        }
+        .delete-btn {
+            margin-left: 10px;
+            color: red;
+            cursor: pointer;
+        }
+        .artist-tag {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #e1e1e1;
+            border-radius: 5px;
+        }
+        .artist-tag .remove-btn {
+            margin-left: 10px;
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Song Management</h1>
+<div>
+    <button onclick="createNewSongRow()">Create New</button>
+    <input type="text" id="searchInput" placeholder="Search by title">
+    <button onclick="searchSongs()">Search</button>
+</div>
+<table id="songTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>File Path</th>
+        <th>Artists</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script>
+    const API_URL = 'songs';
+
+    async function fetchAllSongs() {
+        const response = await fetch(`${API_URL}/all`);
+        const songs = await response.json();
+        populateTable(songs);
+    }
+
+    async function searchSongs() {
+        const title = document.getElementById('searchInput').value;
+        const url = title ? `${API_URL}?title=${encodeURIComponent(title)}` : `${API_URL}/all`;
+        const response = await fetch(url);
+        const songs = await response.json();
+        populateTable(songs);
+    }
+
+    function populateTable(songs) {
+        const tableBody = document.getElementById('songTable').querySelector('tbody');
+        tableBody.innerHTML = '';
+        songs.forEach(song => addSongRow(song));
+    }
+
+    async function addSongRow(song) {
+        const tableBody = document.getElementById('songTable').querySelector('tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${song.id}</td>
+            <td contenteditable="true">${song.title}</td>
+            <td contenteditable="true">${song.filePath}</td>
+            <td>
+                <div>
+                    <input type="search" id="artistSearch-${song.id}" list="artistOptions-${song.id}" placeholder="Search artists" oninput="addArtistTag('${song.id}')">
+                    <datalist id="artistOptions-${song.id}"></datalist>
+                    <div class="artist-list" id="artistTags-${song.id}"></div>
+                </div>
+            </td>
+            <td>
+                <button onclick="updateSong(this, ${song.id})">Save</button>
+                <button onclick="deleteSong(${song.id})">Delete</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+
+        initializeArtistSearch(song.id);
+
+        await loadAndPopulateArtists(song.id);
+    }
+
+    async function initializeArtistSearch(songId) {
+        const response = await fetch('artists');
+        const artists = await response.json();
+
+        const artistOptions = document.getElementById(`artistOptions-${songId}`);
+        artistOptions.innerHTML = '';
+
+        artists.forEach(artist => {
+            const option = document.createElement('option');
+            option.value = artist.name;
+            option.dataset.artistId = artist.id;
+            artistOptions.appendChild(option);
+        });
+    }
+
+    async function addArtistTag(songId) {
+        const artistSearch = document.getElementById(`artistSearch-${songId}`);
+        const artistName = artistSearch.value;
+        const artistOption = document.querySelector(`#artistOptions-${songId} option[value="${artistName}"]`);
+
+        if (artistOption) {
+            const artistId = artistOption.dataset.artistId;
+            const artistTags = document.getElementById(`artistTags-${songId}`);
+
+            const existingTag = artistTags.querySelector(`div[data-artist-id="${artistId}"]`);
+            if (!existingTag) {
+                const tag = document.createElement('div');
+                tag.classList.add('artist-tag');
+                tag.dataset.artistId = artistId;
+                tag.textContent = artistName;
+
+                const removeBtn = document.createElement('span');
+                removeBtn.classList.add('remove-btn');
+                removeBtn.textContent = 'X';
+                removeBtn.onclick = () => {
+                    tag.remove();
+                    removeArtistFromSong(songId, artistId);
+                };
+
+                tag.appendChild(removeBtn);
+                artistTags.appendChild(tag);
+
+                await fetch(`songs/${songId}/artists/${artistId}`, { method: 'POST' });
+            }
+
+            artistSearch.value = '';
+        }
+    }
+
+    async function loadAndPopulateArtists(songId) {
+        const response = await fetch(`${API_URL}/${songId}/artists`);
+        const artists = await response.json();
+        await populateArtistTags(songId, artists);
+    }
+
+    async function populateArtistTags(songId, artists) {
+        console.log(songId, artists);
+        const artistTags = document.getElementById(`artistTags-${songId}`);
+
+        if (artists) {
+            artists.forEach(artist => {
+                const tag = document.createElement('div');
+                tag.classList.add('artist-tag');
+                tag.dataset.artistId = artist.id;
+                tag.textContent = artist.name;
+
+                const removeBtn = document.createElement('span');
+                removeBtn.classList.add('remove-btn');
+                removeBtn.textContent = 'X';
+                removeBtn.onclick = () => {
+                    tag.remove();
+                    removeArtistFromSong(songId, artist.id);
+                };
+
+                tag.appendChild(removeBtn);
+                artistTags.appendChild(tag);
+            });
+        }
+    }
+
+    async function removeArtistFromSong(songId, artistId) {
+        const response = await fetch(`songs/${songId}/artists/${artistId}`, { method: 'DELETE' });
+        if (!response.ok) {
+            alert('Failed to remove artist from song.');
+        }
+    }
+
+    function createNewSongRow() {
+        const tableBody = document.getElementById('songTable').querySelector('tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>New</td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td>
+                <div>
+                    <input type="search" id="artistSearch-new" list="artistOptions-new" placeholder="Search artists" oninput="addArtistTag('new')">
+                    <datalist id="artistOptions-new"></datalist>
+                    <div class="artist-list" id="artistTags-new"></div>
+                </div>
+            </td>
+            <td>
+                <button onclick="saveNewSong(this)">Save</button>
+                <button onclick="this.closest('tr').remove()">Cancel</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+
+        initializeArtistSearch('new');
+    }
+
+    async function saveNewSong(button) {
+        const row = button.closest('tr');
+        const title = row.children[1].innerText.trim();
+        const filePath = row.children[2].innerText.trim();
+        const artistTags = row.querySelectorAll('.artist-tag');
+        const artistIds = Array.from(artistTags).map(tag => tag.dataset.artistId);
+
+        if (!title || !filePath) {
+            alert('Title and file path are required.');
+            return;
+        }
+
+        const songData = { title, filePath };
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(songData),
+        });
+
+        if (response.ok) {
+            const newSong = await response.json();
+            for (const artistId of artistIds) {
+                await fetch(`songs/${newSong.id}/artists/${artistId}`, { method: 'POST' });
+            }
+            fetchAllSongs();
+        } else {
+            alert('Failed to create song.');
+        }
+    }
+
+    async function updateSong(button, id) {
+        const row = button.closest('tr');
+        const title = row.children[1].innerText.trim();
+        const filePath = row.children[2].innerText.trim();
+        const artistIds = Array.from(row.querySelectorAll(`#artistTags-${id} .artist-tag`)).map(tag => tag.dataset.artistId);
+
+        if (!title || !filePath) {
+            alert('Title and file path are required.');
+            return;
+        }
+
+        const songData = { id, title, filePath };
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(songData),
+        });
+    }
+
+    async function deleteSong(id) {
+        if (confirm('Are you sure you want to delete this song?')) {
+            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                fetchAllSongs();
+            } else {
+                alert('Failed to delete song.');
+            }
+        }
+    }
+
+    fetchAllSongs();
+</script>
+</body>
+</html>

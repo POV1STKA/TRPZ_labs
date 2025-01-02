@@ -1,7 +1,6 @@
 package com.OnlineRadio.OnlineRadioStation.iterators;
 
 import com.OnlineRadio.OnlineRadioStation.models.Song;
-
 import java.util.List;
 
 public class SongIterator implements Iterator<Song> {

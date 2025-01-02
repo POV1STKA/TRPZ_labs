@@ -1,13 +1,66 @@
-<!-- src/main/resources/templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Online Radio</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<h1>Welcome to Online Radio Station</h1>
-<p>This is the default home page of your application.</p>
+<div class="header">
+    <div class="header-content">
+        <h2 href="/">Online Radio</h2>
+        <div class="header-buttons">
+            <a href="/login" class="button">Login</a>
+            <a href="/register" class="button">Register</a>
+            <a href="/admin" class="button admin-button">Admin Panel</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <section class="radio-controls">
+        <h1>Welcome to Online Radio</h1>
+        <p>Listen to your favorite music!</p>
+    </section>
+    <section class="radio-controls">
+        <label for="bitrate">Choose bitrate:</label>
+        <select id="bitrate" onchange="updateBitrate(this.value)">
+            <option value="64">64 kbps</option>
+            <option value="92">92 kbps</option>
+            <option value="128" selected>128 kbps</option>
+            <option value="196">196 kbps</option>
+            <option value="224">224 kbps</option>
+        </select>
+        <br><br>
+        <button id="playPauseButton" class="play-button" onclick="togglePlayPause()">Play Song</button>
+        <section class="audio-player">
+            <audio id="audioPlayer" autoplay>
+                <source type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+            <p id="songTitle"></p>
+            <p id="songArtists"></p>
+        </section>
+        <label for="volumeSlider">Volume:</label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
+        <section class="user-info">
+            <p id="userCount">Users connected: 0</p>
+        </section>
+    </section>
+    <section class="song-history">
+        <h2>Song History</h2>
+        <ul id="songHistoryList">
+
+        </ul>
+    </section>
+</div>
+
+<div class="side-gif left">
+    <img src="parrot.gif" alt="Left GIF">
+</div>
+<div class="side-gif right">
+    <img src="parrot.gif" alt="Right GIF">
+</div>
+<script src="script.js"></script>
 </body>
 </html>

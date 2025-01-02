@@ -1,68 +1,44 @@
 package com.OnlineRadio.OnlineRadioStation.models;
 
-import java.util.List;
-import java.util.ArrayList;
-import com.OnlineRadio.OnlineRadioStation.visitor.StatisticsVisitor;
-import com.OnlineRadio.OnlineRadioStation.visitor.Visitable;
+import com.mpatric.mp3agic.Mp3File;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-public class Song implements Visitable{
-    private String id;
+@Entity
+@Table(name = "song")
+@Getter
+@Setter
+public class Song {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "title")
     private String title;
-    private List<String> artistIds;
+
+    @Column(name = "filePath")
     private String filePath;
 
-    public Song(String id, String title, String filePath) {
-        this.id = id;
+    public Song(String title, String filePath) {
         this.title = title;
         this.filePath = filePath;
-        this.artistIds = new ArrayList<>();
+        calculateDuration();
     }
 
-    public Song(String id, String title, String filePath, List<String> artistIds) {
-        this.id = id;
-        this.title = title;
-        this.filePath = filePath;
-        this.artistIds = artistIds;
-    }
+    public Song() {}
 
-    @Override
-    public void accept(StatisticsVisitor visitor) {
-        visitor.visitSong(this);
-    }
-
-        public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<String> getArtistIds() {
-        return artistIds;
-    }
-
-    public void setArtistIds(List<String> artistIds) {
-        this.artistIds = artistIds;
-    }
-
-    public void addArtistId(String artistId) {
-        artistIds.add(artistId);
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public long calculateDuration() {
+        try {
+            Mp3File mp3File = new Mp3File(filePath);
+            if (mp3File.hasId3v1Tag() || mp3File.hasId3v2Tag()) {
+                return mp3File.getLengthInSeconds();
+            }
+        } catch (Exception e) {
+            System.err.println("Error calculating duration for file: " + filePath);
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

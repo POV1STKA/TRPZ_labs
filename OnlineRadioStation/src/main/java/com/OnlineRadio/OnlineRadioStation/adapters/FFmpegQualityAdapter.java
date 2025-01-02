@@ -1,8 +1,8 @@
 package com.OnlineRadio.OnlineRadioStation.adapters;
 
 import com.OnlineRadio.OnlineRadioStation.models.Song;
-
 import java.io.IOException;
+import java.io.File;
 
 public class FFmpegQualityAdapter implements QualityAdapter {
     private int bitrate;
@@ -15,6 +15,12 @@ public class FFmpegQualityAdapter implements QualityAdapter {
     public Song convert(Song song) {
         String inputFilePath = song.getFilePath();
         String outputFilePath = inputFilePath.replace(".mp3", "_" + bitrate + "kbps.mp3");
+
+
+        File outputFile = new File(outputFilePath);
+        if (outputFile.exists()) {
+            return new Song(song.getTitle(), outputFilePath);
+        }
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(

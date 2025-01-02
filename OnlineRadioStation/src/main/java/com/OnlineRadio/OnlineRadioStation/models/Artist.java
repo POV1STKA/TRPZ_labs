@@ -1,29 +1,25 @@
 package com.OnlineRadio.OnlineRadioStation.models;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "artist")
+@Getter
+@Setter
 public class Artist {
-    private String id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name")
     private String name;
 
-    public Artist(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    public Artist() {}
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public Artist(String name) {
         this.name = name;
     }
 }
-
-

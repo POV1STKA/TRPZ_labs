@@ -1,31 +1,17 @@
 package com.OnlineRadio.OnlineRadioStation.repositories;
 
 import com.OnlineRadio.OnlineRadioStation.models.Song;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
 
 @Repository
-public class SongRepository {
-    private final Map<String, Song> songs = new HashMap<>();
+public interface SongRepository extends JpaRepository<Song, Long> {
 
-    public void insert(Song song) {
-        songs.put(song.getId(), song);
-    }
+    Song findById(long id);
 
-    public Song findById(String songId) {
-        return songs.get(songId);
-    }
+    List<Song> findByTitleContainingIgnoreCase(String title);
 
-    public List<Song> findAll() {
-        return new ArrayList<>(songs.values());
-    }
-
-    public void deleteById(String songId) {
-        songs.remove(songId);
-    }
-
-    public void update(Song song) {
-        songs.put(song.getId(), song);
-    }
+    List<Song> findAll();
 }
