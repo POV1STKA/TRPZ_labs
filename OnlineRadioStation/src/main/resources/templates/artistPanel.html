@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        input[type="text"] {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>Artist Management</h1>
+<div>
+    <button onclick="createNewArtistRow()">Create New</button>
+    <input type="text" id="searchInput" placeholder="Search by name">
+    <button onclick="searchArtists()">Search</button>
+</div>
+<table id="artistTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script>
+        const API_URL = 'artists';
+
+        async function fetchAllArtists() {
+            const response = await fetch(`${API_URL}/all`);
+            const artists = await response.json();
+            populateTable(artists);
+        }
+
+        async function searchArtists() {
+            const name = document.getElementById('searchInput').value;
+            const url = name ? `${API_URL}?name=${encodeURIComponent(name)}` : `${API_URL}/all`;
+            const response = await fetch(url);
+            const artists = await response.json();
+            populateTable(artists);
+        }
+
+        function populateTable(artists) {
+            const tableBody = document.getElementById('artistTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+            artists.forEach(artist => addArtistRow(artist));
+        }
+
+        function addArtistRow(artist) {
+            const tableBody = document.getElementById('artistTable').querySelector('tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${artist.id}</td>
+                <td contenteditable="true">${artist.name}</td>
+                <td>
+                    <button onclick="updateArtist(this, ${artist.id})">Save</button>
+                    <button onclick="deleteArtist(${artist.id})">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        function createNewArtistRow() {
+            const tableBody = document.getElementById('artistTable').querySelector('tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>New</td>
+                <td contenteditable="true"></td>
+                <td>
+                    <button onclick="saveNewArtist(this)">Save</button>
+                    <button onclick="this.closest('tr').remove()">Cancel</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        }
+
+        async function saveNewArtist(button) {
+            const row = button.closest('tr');
+            const name = row.children[1].innerText.trim();
+
+            if (!name) {
+                alert('Name is required.');
+                return;
+            }
+
+            const artistData = { name };
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(artistData),
+            });
+
+            if (response.ok) {
+                fetchAllArtists();
+            } else {
+                alert('Failed to create artist.');
+            }
+        }
+
+        async function updateArtist(button, id) {
+            const row = button.closest('tr');
+            const name = row.children[1].innerText.trim();
+
+            if (!name) {
+                alert('Name is required.');
+                return;
+            }
+
+            const artistData = { id, name };
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(artistData),
+            });
+
+            if (response.ok) {
+                fetchAllArtists();
+            } else {
+                alert('Failed to update artist.');
+            }
+        }
+
+        async function deleteArtist(id) {
+            if (confirm('Are you sure you want to delete this artist?')) {
+                const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchAllArtists();
+                } else {
+                    alert('Failed to delete artist.');
+                }
+            }
+        }
+
+        fetchAllArtists();
+    </script>
+</body>
+</html>

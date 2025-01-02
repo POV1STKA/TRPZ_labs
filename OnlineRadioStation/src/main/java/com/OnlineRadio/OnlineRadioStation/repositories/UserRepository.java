@@ -1,18 +1,16 @@
 package com.OnlineRadio.OnlineRadioStation.repositories;
 
 import com.OnlineRadio.OnlineRadioStation.models.User;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public class UserRepository {
-    private Map<String, User> users = new HashMap<>();
+import java.util.List;
+import java.util.Optional;
 
-    public void addUser(User user) {
-        users.put(user.getId(), user);
-    }
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    public User findUserById(String id) {
-        return users.get(id);
-    }
+    List<User> findByLoginContainingIgnoreCase(String login);
+
+    Optional<User> findByLogin(String login);
 }
-

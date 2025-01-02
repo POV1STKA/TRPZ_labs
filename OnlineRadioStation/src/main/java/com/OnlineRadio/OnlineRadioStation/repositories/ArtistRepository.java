@@ -1,18 +1,13 @@
 package com.OnlineRadio.OnlineRadioStation.repositories;
 
 import com.OnlineRadio.OnlineRadioStation.models.Artist;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public class ArtistRepository {
-    private Map<String, Artist> artists = new HashMap<>();
+import java.util.List;
 
-    public void addArtist(Artist artist) {
-        artists.put(artist.getId(), artist);
-    }
+@Repository
+public interface ArtistRepository extends JpaRepository<Artist, Long> {
+    List<Artist> findByNameContainingIgnoreCase(String name);
 
-    public Artist findArtistById(String id) {
-        return artists.get(id);
-    }
 }
-
